@@ -4,8 +4,8 @@ Mockingbird is a simple testing server which responds back to api requests as co
 # Installation (local)
 
 ## Prerequisites 
-   . Mongo
-   . Python 3
+* Mongo
+* Python 3
  
 ```bash
 $ pip install -r requirements.txt
@@ -16,7 +16,9 @@ $ python main.py
  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-# Running with Docker (Coming Soon)
+# Running with Docker
+
+Coming Soon!
 
 # Usage
 
