@@ -1,10 +1,14 @@
+
 import flask
 import json
+import os 
 
-from bson import ObjectId
 from datetime import datetime, timedelta
 from flask import render_template, redirect, Blueprint, g, request, Response
-from mongo import get_connection
+
+from settings import (
+    ENDPOINTS_ROOT,
+)
 
 main_routes = Blueprint('main', __name__)
 
@@ -40,7 +44,6 @@ def main():
 
 @main_routes.route('/route', methods=['GET', 'POST'])
 def routes_endpoint():
-    routes_collection = get_connection().routes
 
     if request.method == "POST":
         payload = request.get_json(force=True)
@@ -56,14 +59,11 @@ def routes_endpoint():
                 "status_code": 400,
                 "message": "project and endpoint parameters are required to create a route"
             }, code=400)
-
-        id = routes_collection.insert_one({
-            "project": project,
-            "endpoint" : endpoint,
-            "methods": methods,  
-            "response_mime": response_mime,
-            "response_body": response_body,
-        }).inserted_id
+        project_path = "%s/%s" % (ENDPOINTS_ROOT.rstrip('/'), project.strip('/'))
+        if os.path.is_dir(project_path) is False:
+            os.makedirs(project_path)
+        
+        endpoint_path = "%s/%s" % (project_path.rstrip('/'), endpoint)
 
         return jsonify({
             "id": id,
@@ -80,14 +80,7 @@ def routes_endpoint():
 def api_routes_endpoint(project, endpoint):
     method = request.method
 
-    routes_collection = get_connection().routes
-
-    resp = routes_collection.find_one({
-        "project": project,
-        "endpoint": endpoint,
-        "methods": method,
-    })
-
+    resp = None
     if resp is None:
         return jsonify({
             "status_code": 404,
