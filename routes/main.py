@@ -83,7 +83,8 @@ def api_routes_endpoint(project, endpoint):
     routes_collection = get_connection().routes
 
     endpoint_with_query_string = endpoint
-    if request.query_string is not None:
+
+    if request.query_string:
         endpoint_with_query_string = "%s?%s" % (endpoint, request.query_string.decode("utf-8"))
 
     resp = routes_collection.find_one({
