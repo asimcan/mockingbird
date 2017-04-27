@@ -76,15 +76,19 @@ def routes_endpoint():
     ])
 
 
-@main_routes.route('/api/<project>/<endpoint>', methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+@main_routes.route('/api/<project>/<path:endpoint>', methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 def api_routes_endpoint(project, endpoint):
     method = request.method
 
     routes_collection = get_connection().routes
 
+    endpoint_with_query_string = endpoint
+    if request.query_string is not None:
+        endpoint_with_query_string = "%s?%s" % (endpoint, request.query_string.decode("utf-8"))
+
     resp = routes_collection.find_one({
         "project": project,
-        "endpoint": endpoint,
+        "endpoint": endpoint_with_query_string,
         "methods": method,
     })
 
